@@ -10,10 +10,13 @@ let snake, apple, direction, nextDirection, gameInterval;
 
 function initGame() {
     snake = [{ x: tileSize * 5, y: tileSize * 5 }];
-    direction = { x: 0, y: 0 };
-    nextDirection = { x: 0, y: 0 };
+    direction = { x: 0, y: 0 }; // Initial direction is stationary
+    nextDirection = { x: 0, y: 0 }; // Next direction is stationary
     spawnApple();
     clearInterval(gameInterval);
+    drawBoard();
+    drawSnake();
+    drawApple();
 }
 
 function spawnApple() {
@@ -40,8 +43,8 @@ function drawApple() {
 
 function updateSnakePosition() {
     const newHead = {
-        x: snake[0].x + nextDirection.x,
-        y: snake[0].y + nextDirection.y
+        x: snake[0].x + direction.x,
+        y: snake[0].y + direction.y
     };
 
     // Check for collisions with walls or self
@@ -59,8 +62,6 @@ function updateSnakePosition() {
     } else {
         snake.pop();
     }
-
-    direction = nextDirection;
 }
 
 function gameLoop() {
@@ -79,6 +80,11 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 's' && direction.y === 0) nextDirection = { x: 0, y: tileSize };
     if (e.key === 'a' && direction.x === 0) nextDirection = { x: -tileSize, y: 0 };
     if (e.key === 'd' && direction.x === 0) nextDirection = { x: tileSize, y: 0 };
+
+    // Update direction only if there's a valid next direction
+    if (nextDirection.x !== 0 || nextDirection.y !== 0) {
+        direction = nextDirection;
+    }
 });
 
 startRestartBtn.addEventListener('click', () => {
