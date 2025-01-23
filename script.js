@@ -88,6 +88,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 startRestartBtn.addEventListener('click', () => {
+    clearInterval(gameInterval); // Clear any existing game intervals
     initGame();
     gameInterval = setInterval(gameLoop, 100);
 });
