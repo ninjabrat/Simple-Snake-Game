@@ -1,18 +1,24 @@
 const canvas = document.getElementById('game-board');
 const ctx = canvas.getContext('2d');
+const scoreBoard = document.getElementById('score-board');
+const highscoreBoard = document.getElementById('highscore-board');
 const startRestartBtn = document.getElementById('start-restart-btn');
 
 const boardSize = 400;
 const tileSize = 20;
 canvas.width = canvas.height = boardSize;
 
-let snake, apple, direction, nextDirection, gameInterval, isMoving;
+let snake, apple, direction, nextDirection, gameInterval, isMoving, score, highscore;
 
 function initGame() {
     snake = [{ x: tileSize * 5, y: tileSize * 5 }];
     direction = { x: 0, y: 0 }; // Initial direction is stationary
     nextDirection = { x: 0, y: 0 }; // Next direction is stationary
     isMoving = false; // Snake is not moving initially
+    score = 0; // Reset score
+    scoreBoard.textContent = `Score: ${score}`;
+    highscore = localStorage.getItem('highscore') || 0;
+    highscoreBoard.textContent = `Highscore: ${highscore}`;
     spawnApple();
     clearInterval(gameInterval);
     drawBoard();
@@ -21,10 +27,15 @@ function initGame() {
 }
 
 function spawnApple() {
-    apple = {
-        x: Math.floor(Math.random() * (boardSize / tileSize)) * tileSize,
-        y: Math.floor(Math.random() * (boardSize / tileSize)) * tileSize
-    };
+    let validPosition = false;
+    while (!validPosition) {
+        apple = {
+            x: Math.floor(Math.random() * (boardSize / tileSize)) * tileSize,
+            y: Math.floor(Math.random() * (boardSize / tileSize)) * tileSize
+        };
+        // Check if apple is spawning on the snake
+        validPosition = !snake.some(segment => segment.x === apple.x && segment.y === apple.y);
+    }
 }
 
 function drawBoard() {
@@ -34,12 +45,18 @@ function drawBoard() {
 
 function drawSnake() {
     ctx.fillStyle = '#00f';
-    snake.forEach(segment => ctx.fillRect(segment.x, segment.y, tileSize, tileSize));
+    snake.forEach(segment => {
+        ctx.fillRect(segment.x, segment.y, tileSize, tileSize);
+        ctx.strokeStyle = '#000';
+        ctx.strokeRect(segment.x, segment.y, tileSize, tileSize);
+    });
 }
 
 function drawApple() {
     ctx.fillStyle = '#f00';
     ctx.fillRect(apple.x, apple.y, tileSize, tileSize);
+    ctx.strokeStyle = '#000';
+    ctx.strokeRect(apple.x, apple.y, tileSize, tileSize);
 }
 
 function updateSnakePosition() {
@@ -54,6 +71,11 @@ function updateSnakePosition() {
     if (newHead.x < 0 || newHead.x >= boardSize || newHead.y < 0 || newHead.y >= boardSize ||
         snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
         clearInterval(gameInterval);
+        if (score > highscore) {
+            highscore = score;
+            localStorage.setItem('highscore', highscore);
+            highscoreBoard.textContent = `Highscore: ${highscore}`;
+        }
         return;
     }
 
@@ -61,6 +83,8 @@ function updateSnakePosition() {
 
     // Check if snake has eaten the apple
     if (newHead.x === apple.x && newHead.y === apple.y) {
+        score++;
+        scoreBoard.textContent = `Score: ${score}`;
         spawnApple();
     } else {
         snake.pop();
