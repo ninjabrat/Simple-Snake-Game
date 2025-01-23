@@ -17,6 +17,11 @@ body {
     background-color: #fff;
 }
 
+#score-board, #highscore-board {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
 #start-restart-btn {
     margin-top: 20px;
     padding: 10px 20px;
