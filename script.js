@@ -6,12 +6,13 @@ const boardSize = 400;
 const tileSize = 20;
 canvas.width = canvas.height = boardSize;
 
-let snake, apple, direction, nextDirection, gameInterval;
+let snake, apple, direction, nextDirection, gameInterval, isMoving;
 
 function initGame() {
     snake = [{ x: tileSize * 5, y: tileSize * 5 }];
     direction = { x: 0, y: 0 }; // Initial direction is stationary
     nextDirection = { x: 0, y: 0 }; // Next direction is stationary
+    isMoving = false; // Snake is not moving initially
     spawnApple();
     clearInterval(gameInterval);
     drawBoard();
@@ -42,6 +43,8 @@ function drawApple() {
 }
 
 function updateSnakePosition() {
+    if (!isMoving) return;
+
     const newHead = {
         x: snake[0].x + direction.x,
         y: snake[0].y + direction.y
@@ -72,23 +75,25 @@ function gameLoop() {
 }
 
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' && direction.y === 0) nextDirection = { x: 0, y: -tileSize };
-    if (e.key === 'ArrowDown' && direction.y === 0) nextDirection = { x: 0, y: tileSize };
-    if (e.key === 'ArrowLeft' && direction.x === 0) nextDirection = { x: -tileSize, y: 0 };
-    if (e.key === 'ArrowRight' && direction.x === 0) nextDirection = { x: tileSize, y: 0 };
-    if (e.key === 'w' && direction.y === 0) nextDirection = { x: 0, y: -tileSize };
-    if (e.key === 's' && direction.y === 0) nextDirection = { x: 0, y: tileSize };
-    if (e.key === 'a' && direction.x === 0) nextDirection = { x: -tileSize, y: 0 };
-    if (e.key === 'd' && direction.x === 0) nextDirection = { x: tileSize, y: 0 };
+    let newDirection = null;
 
-    // Update direction only if there's a valid next direction
-    if (nextDirection.x !== 0 || nextDirection.y !== 0) {
-        direction = nextDirection;
+    if (e.key === 'ArrowUp' && direction.y === 0) newDirection = { x: 0, y: -tileSize };
+    if (e.key === 'ArrowDown' && direction.y === 0) newDirection = { x: 0, y: tileSize };
+    if (e.key === 'ArrowLeft' && direction.x === 0) newDirection = { x: -tileSize, y: 0 };
+    if (e.key === 'ArrowRight' && direction.x === 0) newDirection = { x: tileSize, y: 0 };
+    if (e.key === 'w' && direction.y === 0) newDirection = { x: 0, y: -tileSize };
+    if (e.key === 's' && direction.y === 0) newDirection = { x: 0, y: tileSize };
+    if (e.key === 'a' && direction.x === 0) newDirection = { x: -tileSize, y: 0 };
+    if (e.key === 'd' && direction.x === 0) newDirection = { x: tileSize, y: 0 };
+
+    // Update direction only if there's a valid new direction
+    if (newDirection) {
+        direction = newDirection;
+        isMoving = true; // Start moving the snake
     }
 });
 
 startRestartBtn.addEventListener('click', () => {
-    clearInterval(gameInterval); // Clear any existing game intervals
     initGame();
     gameInterval = setInterval(gameLoop, 100);
 });
