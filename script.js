@@ -110,10 +110,12 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'a' && direction.x === 0) newDirection = { x: -tileSize, y: 0 };
     if (e.key === 'd' && direction.x === 0) newDirection = { x: tileSize, y: 0 };
 
-    // Update direction only if there's a valid new direction
+    // Prevent the snake from reversing into itself
     if (newDirection) {
-        direction = newDirection;
-        isMoving = true; // Start moving the snake
+        if ((newDirection.x !== -direction.x || newDirection.y !== -direction.y) || !isMoving) {
+            direction = newDirection;
+            isMoving = true; // Start moving the snake
+        }
     }
 });
 
