@@ -96,27 +96,29 @@ function gameLoop() {
     drawSnake();
     drawApple();
     updateSnakePosition();
+    direction = { ...nextDirection }; // Apply the next direction
 }
 
 window.addEventListener('keydown', (e) => {
-    let newDirection = null;
-
-    if (e.key === 'ArrowUp' && direction.y === 0) newDirection = { x: 0, y: -tileSize };
-    if (e.key === 'ArrowDown' && direction.y === 0) newDirection = { x: 0, y: tileSize };
-    if (e.key === 'ArrowLeft' && direction.x === 0) newDirection = { x: -tileSize, y: 0 };
-    if (e.key === 'ArrowRight' && direction.x === 0) newDirection = { x: tileSize, y: 0 };
-    if (e.key === 'w' && direction.y === 0) newDirection = { x: 0, y: -tileSize };
-    if (e.key === 's' && direction.y === 0) newDirection = { x: 0, y: tileSize };
-    if (e.key === 'a' && direction.x === 0) newDirection = { x: -tileSize, y: 0 };
-    if (e.key === 'd' && direction.x === 0) newDirection = { x: tileSize, y: 0 };
-
-    // Prevent the snake from reversing into itself
-    if (newDirection) {
-        if ((newDirection.x !== -direction.x || newDirection.y !== -direction.y) || !isMoving) {
-            direction = newDirection;
-            isMoving = true; // Start moving the snake
-        }
+    switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+            if (direction.y === 0) nextDirection = { x: 0, y: -tileSize };
+            break;
+        case 'ArrowDown':
+        case 's':
+            if (direction.y === 0) nextDirection = { x: 0, y: tileSize };
+            break;
+        case 'ArrowLeft':
+        case 'a':
+            if (direction.x === 0) nextDirection = { x: -tileSize, y: 0 };
+            break;
+        case 'ArrowRight':
+        case 'd':
+            if (direction.x === 0) nextDirection = { x: tileSize, y: 0 };
+            break;
     }
+    isMoving = true; // Start moving the snake
 });
 
 startRestartBtn.addEventListener('click', () => {
